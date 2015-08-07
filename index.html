@@ -79,7 +79,7 @@ function initMap() {
     for (var i = 0; i < data.length; i++) {
       htmlStr.push('<li data-pid="'+ data[i]['$']['diffgr:id'].toLowerCase() +'" class="'+ data[i]['$']['diffgr:id'].toLowerCase() +'">');
         htmlStr.push('<p><span class="case-label">' + data[i].PName + '</span>');
-        htmlStr.push('<span class="case-label label-'+ data[i].CaseComplete +'">'+ ((data[i].CaseComplete) ? '已處理' : '待處理') +'</span></p>');
+        htmlStr.push('<span class="case-label label-'+ data[i].CaseComplete +'">'+ ((data[i].CaseComplete === "true") ? '已處理' : '待處理') +'</span></p>');
         htmlStr.push('<p>地點：' + data[i].CaseLocationDistrict + data[i].CaseLocationDescription + '</p>');
         htmlStr.push('<p>時間：' + data[i].CaseTime + '</p>');
         htmlStr.push('<p>狀況：' + data[i].Name + '</p>');
