@@ -47,10 +47,11 @@ function initMap() {
     styles: styles
   };
 
-  var pinColor = "";
-  var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.75|0|FE7569|15|b|%E5%8D%B1");
 
   var addMarker = function(data){
+    var pinColor = (data.CaseComplete[0] === "true") ? "80e516" : "FE7569";
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.75|0|"+ pinColor +"|15|b|%E5%8D%B1");
+
     var marker = new google.maps.Marker({
         position: new google.maps.LatLng( data.Wgs84Y, data.Wgs84X ),
         map: map,
@@ -79,7 +80,7 @@ function initMap() {
     for (var i = 0; i < data.length; i++) {
       htmlStr.push('<li data-pid="'+ data[i]['$']['diffgr:id'].toLowerCase() +'" class="'+ data[i]['$']['diffgr:id'].toLowerCase() +'">');
         htmlStr.push('<p><span class="case-label">' + data[i].PName + '</span>');
-        htmlStr.push('<span class="case-label label-'+ data[i].CaseComplete +'">'+ ((data[i].CaseComplete == "true") ? '已處理' : '待處理') +'</span></p>');
+        htmlStr.push('<span class="case-label label-'+ data[i].CaseComplete +'">'+ ((data[i].CaseComplete[0] === "true") ? '已處理' : '待處理') +'</span></p>');
         htmlStr.push('<p>地點：' + data[i].CaseLocationDistrict + data[i].CaseLocationDescription + '</p>');
         htmlStr.push('<p>時間：' + data[i].CaseTime + '</p>');
         htmlStr.push('<p>狀況：' + data[i].Name + '</p>');
