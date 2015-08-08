@@ -36,6 +36,10 @@
 
 <script>
 var map, mc, markers = [];
+google.maps.InfoWindow.prototype.isOpen = function(){
+  var map = this.getMap();
+  return (map !== null && typeof map !== "undefined");
+}
 
 function initMap() {
 
@@ -51,7 +55,7 @@ function initMap() {
 
   var addMarker = function(data){
     var pinColor = (data.CaseComplete[0] === "true") ? "80e516" : "FE7569";
-    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.75|0|"+ pinColor +"|15|b|%E5%8D%B1");
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.7|0|"+ pinColor +"|15|b|%E5%8D%B1");
 
     var marker = new google.maps.Marker({
         position: new google.maps.LatLng( data.Wgs84Y, data.Wgs84X ),
@@ -61,19 +65,25 @@ function initMap() {
         title: data.CaseLocationDistrict + data.CaseLocationDescription,
         pinColor: pinColor
     });
+
+    marker.infowindow = new google.maps.InfoWindow({
+      content: '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=200x180&location='+ data.Wgs84Y +','+data.Wgs84X+'&fov=90&heading=180&pitch=10"></p>'
+    });
+
     markers.push(marker);
 
     google.maps.event.addListener(marker, 'click', function(e){
       map.panTo( this.position );
       map.setZoom(17);
-      for (var i = 0; i < markers.length; i++) { markers[i].setIcon( new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.75|0|"+ markers[i].pinColor +"|15|b|%E5%8D%B1") ); }
-      this.setIcon(new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=1.5|0|"+ this.pinColor +"|22|b|%E5%8D%B1"));
-
+      for (var i = 0; i < markers.length; i++) { markers[i].setIcon( new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.7|0|"+ markers[i].pinColor +"|15|b|%E5%8D%B1") ); }
+      this.setIcon(new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_spin&chld=1.3|0|"+ this.pinColor +"|22|b|%E5%8D%B1"));
       $('.list').scrollTop(0);
       $('.list .is-active').removeClass('is-active');
       var currElem = $('.list .' + this.pid);
       currElem.addClass('is-active');
       $('.list').stop().animate({ scrollTop: currElem.offset().top - 50 }, 500);
+      for (var i = 0; i < markers.length; i++) { if(markers[i].infowindow.isOpen()){ markers[i].infowindow.close(); } }
+      this.infowindow.open(map, marker);
     });
   };
 
