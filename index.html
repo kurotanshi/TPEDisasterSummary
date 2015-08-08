@@ -22,22 +22,21 @@
     .label-false{ background-color: #EBCCCC; color: #a94442; }
     .label-true{ background-color: #D0E9C6;  color: #3c763d; }
   </style>
+
   <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
   <script src="//maps.googleapis.com/maps/api/js"></script>
-
+  <script src="//googlemaps.github.io/js-marker-clusterer/src/markerclusterer_compiled.js"></script>
 </head>
 <body onload="initMap()">
   <div id="map"></div>
   <div class="list"></div>
 
 <script>
-var map;
+var map, mc, markers = [];
 
 function initMap() {
 
   var styles=[{featureType:"administrative",elementType:"all",stylers:[{visibility:"on"},{lightness:33}]},{featureType:"landscape",elementType:"all",stylers:[{color:"#f2e5d4"}]},{featureType:"poi.park",elementType:"geometry",stylers:[{color:"#c5dac6"}]},{featureType:"poi.park",elementType:"labels",stylers:[{visibility:"on"},{lightness:20}]},{featureType:"road",elementType:"all",stylers:[{lightness:20}]},{featureType:"road.highway",elementType:"geometry",stylers:[{color:"#c5c6c6"}]},{featureType:"road.arterial",elementType:"geometry",stylers:[{color:"#e4d7c6"}]},{featureType:"road.local",elementType:"geometry",stylers:[{color:"#fbfaf7"}]},{featureType:"water",elementType:"all",stylers:[{visibility:"on"},{color:"#acbcc9"}]}];
-
-  var markers = [];
 
   // 地圖初始設定
   var mapOptions = {
@@ -46,7 +45,6 @@ function initMap() {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     styles: styles
   };
-
 
   var addMarker = function(data){
     var pinColor = (data.CaseComplete[0] === "true") ? "80e516" : "FE7569";
@@ -94,10 +92,12 @@ function initMap() {
   };
 
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
   $.get('https://tcgbusfs.blob.core.windows.net/blobfs/GetDisasterSummary.json', function(raw){
     var data = raw.DataSet["diffgr:diffgram"][0].NewDataSet[0].CASE_SUMMARY;
     renderList(data);
     for (var i = 0; i < data.length; i++) { addMarker( data[i] ); }
+    mc = new MarkerClusterer(map, markers, {gridSize: 50, maxZoom: 20});
 
     $('.list').on('click', 'li', function(e){
       e.preventDefault();
