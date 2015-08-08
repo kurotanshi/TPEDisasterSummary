@@ -106,7 +106,7 @@ function initMap() {
 
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-  $.get('https://tcgbusfs.blob.core.windows.net/blobfs/GetDisasterSummary.json', function(raw){
+  $.get('http://tonyq.org/kptaipei/GetDisasterSummary-20150808.php', function(raw){
     var data = raw.DataSet["diffgr:diffgram"][0].NewDataSet[0].CASE_SUMMARY;
     var count = [0, 0];
     renderList(data);
