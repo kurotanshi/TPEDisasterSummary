@@ -44,7 +44,7 @@ function initMap() {
   // 地圖初始設定
   var mapOptions = {
     center: new google.maps.LatLng(25.06464, 121.55676),
-    zoom: 13,
+    zoom: 12,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     styles: styles
   };
@@ -108,7 +108,6 @@ function initMap() {
     mc = new MarkerClusterer(map, markers, {gridSize: 80, maxZoom: 16});
 
     $('.header').append('<em class="msg">已處理: ' + count[0] + ' 筆，待處理: ' + count[1] + ' 筆');
-
     $('.list').on('click', 'li', function(e){
       e.preventDefault();
       var pid = $(this).data('pid');
