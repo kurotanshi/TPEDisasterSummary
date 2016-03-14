@@ -64,6 +64,8 @@ dataMap.setStyle(function(feature) {
     fillColor: colors[level],
     strokeColor: colors[level],
     strokeWeight: 2,
+    fillOpacity: 0.65,
+    zIndex: (level+1),
     visible: true
   };
 });
@@ -83,6 +85,8 @@ $('.level').on('change', function(e){
         fillColor: colors[level],
         strokeColor: colors[level],
         strokeWeight: 2,
+        fillOpacity: 0.65,
+        zIndex: (level+1),
         visible: (i === level)
       };
     });
@@ -95,6 +99,8 @@ $('.level').on('change', function(e){
         fillColor: colors[level],
         strokeColor: colors[level],
         strokeWeight: 2,
+        fillOpacity: 0.65,
+        zIndex: (level+1),
         visible: true
       };
     });
