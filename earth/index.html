@@ -1,0 +1,105 @@
+<html>
+<head>
+  <title>土壤液化潛勢區地圖</title>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%; margin: 0; padding: 0;
+    }
+    #map{
+      position: relative; width: 100%; height: 100%; z-index: 2;
+    }
+    .level-wraps{
+      position: absolute; z-index: 10; left: 10px; top: 10px;
+      display: block; background-color: #fff; border: 1px solid #000;
+      width: 430px; height: 50px; font-size: 16px; padding: 1em;
+    }
+    select{ margin-left: 5px; display: inline; }
+    .resource{ margin-top: 12px; font-size: 14px;}
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="level-wraps">
+  <span>潛勢等級:</span>
+  <select class="level">
+    <option value="0">低潛勢區</option>
+    <option value="1">中潛勢區</option>
+    <option value="2">高潛勢區</option>
+    <option value="3" selected>全部顯示</option>
+  </select>
+  <div class="resource">
+    資料來源: <a href="http://map.tgos.tw/TGOSimpleViewer2/Web/Map/TGOSimpleViewer_Map.aspx" target="_blank">經濟部中央地質調查所 土壤液化潛勢區查詢系統</a>
+  </div>
+</div>
+
+
+<script src="http://maps.googleapis.com/maps/api/js?libraries=drawing,places"></script>
+<script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+
+<script type="text/javascript">
+(function(){
+
+var map;
+var dataMap = new google.maps.Data();
+var geojson = null;
+var style=[{featureType:"administrative",elementType:"labels.text.fill",stylers:[{color:"#444444"}]},{featureType:"administrative.locality",elementType:"labels",stylers:[{visibility:"on"}]},{featureType:"landscape",elementType:"all",stylers:[{color:"#f2f2f2"},{visibility:"simplified"}]},{featureType:"poi",elementType:"all",stylers:[{visibility:"on"}]},{featureType:"poi",elementType:"geometry",stylers:[{visibility:"simplified"},{saturation:"-65"},{lightness:"45"},{gamma:"1.78"}]},{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]},{featureType:"poi",elementType:"labels.icon",stylers:[{visibility:"off"}]},{featureType:"poi.park",elementType:"geometry.fill",stylers:[{color:"#e4f7e6"}]},{featureType:"road",elementType:"all",stylers:[{saturation:-100},{lightness:45}]},{featureType:"road",elementType:"labels",stylers:[{visibility:"on"}]},{featureType:"road",elementType:"labels.icon",stylers:[{visibility:"off"}]},{featureType:"road.highway",elementType:"all",stylers:[{visibility:"simplified"}]},{featureType:"road.highway",elementType:"labels.icon",stylers:[{visibility:"off"}]},{featureType:"road.arterial",elementType:"labels.icon",stylers:[{visibility:"off"}]},{featureType:"transit.line",elementType:"geometry",stylers:[{saturation:"-33"},{lightness:"22"},{gamma:"2.08"}]},{featureType:"transit.station.airport",elementType:"geometry",stylers:[{gamma:"2.08"},{hue:"#ffa200"}]},{featureType:"transit.station.airport",elementType:"labels",stylers:[{visibility:"off"}]},{featureType:"transit.station.rail",elementType:"labels.text",stylers:[{visibility:"off"}]},{featureType:"transit.station.rail",elementType:"labels.icon",stylers:[{visibility:"simplified"},{saturation:"-55"},{lightness:"-2"},{gamma:"1.88"},{hue:"#ffab00"}]},{featureType:"water",elementType:"all",stylers:[{color:"#bbd9e5"},{visibility:"simplified"}]}];
+
+map = new google.maps.Map(document.getElementById('map'), {
+  zoom: 10,
+  center: new google.maps.LatLng(25.064393, 121.533501),
+  mapTypeId: google.maps.MapTypeId.ROADMAP,
+  styles: style
+});
+
+dataMap.setStyle(function(feature) {
+  var level = feature.getProperty('classify');
+  var colors = ['yellow', 'orange', 'red'];
+
+  return {
+    fillColor: colors[level],
+    strokeColor: colors[level],
+    strokeWeight: 2,
+    visible: true
+  };
+});
+
+dataMap.loadGeoJson('geo.json');
+dataMap.setMap(map);
+
+$('.level').on('change', function(e){
+  var i = parseInt($(this).val(), 10);
+
+  if( i < 3 ){
+    dataMap.setStyle(function(feature) {
+      var level = feature.getProperty('classify');
+      var colors = ['yellow', 'orange', 'red'];
+
+      return {
+        fillColor: colors[level],
+        strokeColor: colors[level],
+        strokeWeight: 2,
+        visible: (i === level)
+      };
+    });
+  }else{
+    dataMap.setStyle(function(feature) {
+      var level = feature.getProperty('classify');
+      var colors = ['yellow', 'orange', 'red'];
+
+      return {
+        fillColor: colors[level],
+        strokeColor: colors[level],
+        strokeWeight: 2,
+        visible: true
+      };
+    });
+  }
+});
+
+})();
+</script>
+
+</body>
+</html>
