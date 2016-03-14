@@ -58,13 +58,13 @@ map = new google.maps.Map(document.getElementById('map'), {
 
 dataMap.setStyle(function(feature) {
   var level = feature.getProperty('classify');
-  var colors = ['yellow', 'orange', 'red'];
+  var colors = ['#9ACD32', '#FED261', 'red'];
 
   return {
     fillColor: colors[level],
     strokeColor: colors[level],
     strokeWeight: 2,
-    fillOpacity: 0.65,
+    fillOpacity: 0.6,
     zIndex: (level+1),
     visible: true
   };
@@ -79,13 +79,13 @@ $('.level').on('change', function(e){
   if( i < 3 ){
     dataMap.setStyle(function(feature) {
       var level = feature.getProperty('classify');
-      var colors = ['yellow', 'orange', 'red'];
+      var colors = ['#9ACD32', '#FED261', 'red'];
 
       return {
         fillColor: colors[level],
         strokeColor: colors[level],
         strokeWeight: 2,
-        fillOpacity: 0.65,
+        fillOpacity: 0.6,
         zIndex: (level+1),
         visible: (i === level)
       };
@@ -93,13 +93,13 @@ $('.level').on('change', function(e){
   }else{
     dataMap.setStyle(function(feature) {
       var level = feature.getProperty('classify');
-      var colors = ['yellow', 'orange', 'red'];
+      var colors = ['#9ACD32', '#FED261', 'red'];
 
       return {
         fillColor: colors[level],
         strokeColor: colors[level],
         strokeWeight: 2,
-        fillOpacity: 0.65,
+        fillOpacity: 0.6,
         zIndex: (level+1),
         visible: true
       };
