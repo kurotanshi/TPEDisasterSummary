@@ -154,9 +154,9 @@ $('.query').on('click', function(e){
         markers.push( marker );
 
         if( turf.inside(point, features[i]) ){
-          console.log( features[i] );
           infowindow.setContent( features[i].properties['分級'] );
           infowindow.open(map, marker);
+          break;
         }
       }
 
