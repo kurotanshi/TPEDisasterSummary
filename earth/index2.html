@@ -140,19 +140,20 @@ $('.query').on('click', function(e){
   }
 
   geocodeLatLng( geocoder, $('.addr').val() ).then(function(d){
+
     if( typeof d === 'object' ){
       point = turf.point([d.lng, d.lat]);
+      map.setZoom(14);
+      map.setCenter( new google.maps.LatLng(d.lat, d.lng) );
+
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(d.lat, d.lng),
+        map: map
+      });
+
+      markers.push( marker );
+
       for (var i = 0; i < features.length; i++) {
-        map.setZoom(14);
-        map.setCenter( new google.maps.LatLng(d.lat, d.lng) );
-
-        var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(d.lat, d.lng),
-          map: map
-        });
-
-        markers.push( marker );
-
         if( turf.inside(point, features[i]) ){
           infowindow.setContent( features[i].properties['分級'] );
           infowindow.open(map, marker);
