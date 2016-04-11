@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>台北市颱風災害動態資訊</title>
+  <style>
+  /* http://meyerweb.com/eric/tools/css/reset/
+     v2.0 | 20110126
+     License: none (public domain)
+  */
+  a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}
+
+    html, body{ font-size: 16px; width: 1200px; height: auto; overflow: hidden; }
+    .header{ display: block; text-align: center; width: 100%; height: 50px; line-height: 50px;
+              background-color: #666; color: #f7f7f7; position: relative; }
+    .header .msg{ position: absolute; right: 2.5em; }
+    #map { width: 850px; height: 700px; float: left; }
+    .list{ height: 700px; width: 350px; overflow-y: scroll; float: left;  }
+    .list p{ line-height: 130%; margin: 0.75em 0; }
+    .list li{ display: block; font-size: 15px; min-height: 100px; padding: 1em; border-bottom: 1px solid #aaa; background-color: #ffffff; }
+    .list li:hover{ background-color: #eee; cursor: pointer; }
+    .list li.is-active{ background-color: #f2e5f7; }
+    .case-label{ position: relative; font-size: 12px; padding: 3px 4px; margin-right: 7px; background-color: #337AB7; color: #fff; border-radius: 3px; bottom: 3px; }
+    .label-false{ background-color: #EBCCCC; color: #a94442; }
+    .label-true{ background-color: #D0E9C6;  color: #3c763d; }
+  </style>
+
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="//maps.googleapis.com/maps/api/js"></script>
+  <script src="//googlemaps.github.io/js-marker-clusterer/src/markerclusterer_compiled.js"></script>
+</head>
+<body onload="initMap()">
+  <header class="header">台北市颱風災害動態資訊</header>
+  <div id="map"></div>
+  <div class="list"></div>
+
+<script>
+var map, mc, markers = [];
+google.maps.InfoWindow.prototype.isOpen = function(){
+  var map = this.getMap();
+  return (map !== null && typeof map !== "undefined");
+}
+
+function initMap() {
+
+  var styles=[{featureType:"administrative",elementType:"all",stylers:[{visibility:"on"},{lightness:33}]},{featureType:"landscape",elementType:"all",stylers:[{color:"#f2e5d4"}]},{featureType:"poi.park",elementType:"geometry",stylers:[{color:"#c5dac6"}]},{featureType:"poi.park",elementType:"labels",stylers:[{visibility:"on"},{lightness:20}]},{featureType:"road",elementType:"all",stylers:[{lightness:20}]},{featureType:"road.highway",elementType:"geometry",stylers:[{color:"#c5c6c6"}]},{featureType:"road.arterial",elementType:"geometry",stylers:[{color:"#e4d7c6"}]},{featureType:"road.local",elementType:"geometry",stylers:[{color:"#fbfaf7"}]},{featureType:"water",elementType:"all",stylers:[{visibility:"on"},{color:"#acbcc9"}]}];
+
+  // 地圖初始設定
+  var mapOptions = {
+    center: new google.maps.LatLng(25.06464, 121.55676),
+    zoom: 12,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    styles: styles
+  };
+
+  var addMarker = function(data){
+    var pinColor = (data.CaseComplete[0] === "true") ? "80e516" : "FE7569";
+    var pinImage = new google.maps.MarkerImage("//chart.apis.google.com/chart?chst=d_map_spin&chld=0.7|0|"+ pinColor +"|15|b|%E5%8D%B1");
+
+    var marker = new google.maps.Marker({
+        position: new google.maps.LatLng( data.Wgs84Y, data.Wgs84X ),
+        map: map,
+        pid: data['$']['diffgr:id'].toLowerCase(),
+        icon: pinImage,
+        title: data.CaseLocationDistrict + data.CaseLocationDescription,
+        pinColor: pinColor
+    });
+
+    marker.infowindow = new google.maps.InfoWindow({
+      content: '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=200x180&location='+ data.Wgs84Y +','+data.Wgs84X+'&fov=90&heading=180&pitch=10"></p>'
+    });
+
+    markers.push(marker);
+
+    google.maps.event.addListener(marker, 'click', function(e){
+      map.panTo( this.position );
+      map.setZoom(17);
+      for (var i = 0; i < markers.length; i++) { markers[i].setIcon( new google.maps.MarkerImage("//chart.apis.google.com/chart?chst=d_map_spin&chld=0.7|0|"+ markers[i].pinColor +"|15|b|%E5%8D%B1") ); }
+      this.setIcon(new google.maps.MarkerImage("//chart.apis.google.com/chart?chst=d_map_spin&chld=1.3|0|"+ this.pinColor +"|22|b|%E5%8D%B1"));
+      $('.list').scrollTop(0);
+      $('.list .is-active').removeClass('is-active');
+      var currElem = $('.list .' + this.pid);
+      currElem.addClass('is-active');
+      $('.list').stop().animate({ scrollTop: currElem.offset().top - 50 }, 500);
+      for (var i = 0; i < markers.length; i++) { if(markers[i].infowindow.isOpen()){ markers[i].infowindow.close(); } }
+      this.infowindow.open(map, marker);
+    });
+  };
+
+  var renderList = function(data){
+    var list = document.createElement('ul'), htmlStr = [];
+    for (var i = 0; i < data.length; i++) {
+      htmlStr.push('<li data-pid="'+ data[i]['$']['diffgr:id'].toLowerCase() +'" class="'+ data[i]['$']['diffgr:id'].toLowerCase() +'">');
+        htmlStr.push('<p><span class="case-label">' + data[i].PName + '</span>');
+        htmlStr.push('<span class="case-label label-'+ data[i].CaseComplete +'">'+ ((data[i].CaseComplete[0] === "true") ? '已處理' : '待處理') +'</span></p>');
+        htmlStr.push('<p>地點：' + data[i].CaseLocationDistrict + data[i].CaseLocationDescription + '</p>');
+        htmlStr.push('<p>時間：' + data[i].CaseTime + '</p>');
+        htmlStr.push('<p>狀況：' + data[i].Name + '</p>');
+        htmlStr.push('<p>描述：' + data[i].CaseDescription + '</p>');
+      htmlStr.push('</li>');
+    }
+
+    list.innerHTML = htmlStr.join('');
+    $('.list').append(list);
+  };
+
+  map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  $.get('//tonyq.org/kptaipei/GetDisasterSummary-20150808.php', function(raw){
+    var data = raw.DataSet["diffgr:diffgram"][0].NewDataSet[0].CASE_SUMMARY;
+    var count = [0, 0];
+    renderList(data);
+    for (var i = 0; i < data.length; i++) {
+      addMarker( data[i] );
+      if( data[i].CaseComplete[0] === "true" ) count[0]++;
+      else count[1]++;
+    }
+    mc = new MarkerClusterer(map, markers, {gridSize: 80, maxZoom: 16});
+
+    $('.header').append('<em class="msg">已處理: ' + count[0] + ' 筆，待處理: ' + count[1] + ' 筆');
+    $('.list').on('click', 'li', function(e){
+      e.preventDefault();
+      var pid = $(this).data('pid');
+      for (var i = 0; i < markers.length; i++) {
+        if( markers[i].pid === pid ){
+          google.maps.event.trigger(markers[i], 'click');
+          break;
+        }
+      }
+    });
+  });
+}
+</script>
+
+
+</body>
+</html>

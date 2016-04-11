@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style type="text/css">
+    html, body{
+      padding: 0; margin: 0; width: 100%; height: 100%;
+    }
+    #map{
+      position: relative; width: 45%; height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="//maps.googleapis.com/maps/api/js"></script>
+  <script src="//googlemaps.github.io/js-marker-clusterer/src/markerclusterer_compiled.js"></script>
+
+  <script src="//api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.0/turf.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.20/topojson.min.js"></script>
+
+
+<script type="text/javascript">
+(function(window, $){
+  var map;
+  var dataMap = new google.maps.Data();
+
+  dataMap.setStyle(function(feature){
+    return {
+      'fillColor': 'transparent',
+      'strokeWeight': 2,
+      'strokeColor': 'rgba(55, 55, 55, 0.45)'
+    };
+  });
+
+  // 地圖初始設定
+  var mapOptions = {
+    center: new google.maps.LatLng(23.7, 121),
+    zoom: 8,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+  $.get('./citys.json', function (topodata) {
+    var features = topojson.feature(topodata, topodata.objects.County_MOI_1041005).features;
+    for (var i = 0; i < features.length; i++) { dataMap.addGeoJson(features[i]); }
+    dataMap.setMap(map);
+  });
+
+
+
+
+
+})(window, $);
+</script>
+
+</body>
+</html>
