@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>土壤液化潛勢區示意地圖</title>
+  <title>台北市土壤液化潛勢圖</title>
   <meta charset="utf-8">
   <meta property="og:title" content="土壤液化潛勢區示意地圖"/>
   <meta property="og:image" content="http://kurotanshi.github.io/TPEDisasterSummary/earth/earth.png"/>
@@ -27,14 +27,16 @@
 <div class="level-wraps">
   <span>潛勢等級:</span>
   <select class="level">
-    <option value="0">低潛勢區</option>
-    <option value="1">中潛勢區</option>
-    <option value="2">高潛勢區</option>
-    <option value="3" selected>全部顯示</option>
+    <option value="0">非本圖所示資料精度區</option>
+    <option value="1">無液化</option>
+    <option value="2">低度液化</option>
+    <option value="3">中度液化</option>
+    <option value="4">高度液化</option>
+    <option value="5" selected>全部顯示</option>
   </select>
   <div class="resource">
-  資料來源: <a href="http://www.moeacgs.gov.tw/2016.htm" target="_blank">經濟部中央地質調查所 土壤液化潛勢區查詢系統</a></div>
-  <div class="resource">本地圖僅供參考，請依經濟部中央地質調查所提供資料為準。</div>
+  資料來源: <a href="http://soil2.taipei/gismap.html" target="_blank">臺北市政府土壤液化潛勢查詢系統</a></div>
+  <div class="resource">本地圖僅供參考。</div>
 </div>
 
 
@@ -57,29 +59,51 @@ map = new google.maps.Map(document.getElementById('map'), {
 });
 
 dataMap.setStyle(function(feature) {
-  var level = feature.getProperty('classify');
-  var colors = ['#9ACD32', '#FED261', 'red'];
+
+  var level = 0;
+  var lv = feature.getProperty('液化程度');
+
+  if( lv === '高度液化'){ level = 4; }
+  else if( lv === '中度液化'){ level = 3; }
+  else if( lv === '低度液化'){ level = 2; }
+  else if( lv === '無液化'){ level = 1; }
+  else if( lv === '非本圖所示資料精度區'){ level = 0; }
+
+  var colors = ['#49CCED', '#555555', '#9ACD32', '#FED261', 'red'];
 
   return {
     fillColor: colors[level],
     strokeColor: colors[level],
     strokeWeight: 2,
-    fillOpacity: 0.45,
+    fillOpacity: 0.4,
     zIndex: (level+1),
     visible: true
   };
 });
 
-dataMap.loadGeoJson('geo.json');
+dataMap.loadGeoJson('datas/91swh.geojson');
+dataMap.loadGeoJson('datas/91swm.geojson');
+dataMap.loadGeoJson('datas/91swl.geojson');
+dataMap.loadGeoJson('datas/91swn.geojson');
+dataMap.loadGeoJson('datas/91sw0.geojson');
 dataMap.setMap(map);
 
 $('.level').on('change', function(e){
   var i = parseInt($(this).val(), 10);
 
-  if( i < 3 ){
+  if( i < 5 ){
     dataMap.setStyle(function(feature) {
-      var level = feature.getProperty('classify');
-      var colors = ['#9ACD32', '#FED261', 'red'];
+
+      var level = 0;
+      var lv = feature.getProperty('液化程度');
+
+      if( lv === '高度液化'){ level = 4; }
+      else if( lv === '中度液化'){ level = 3; }
+      else if( lv === '低度液化'){ level = 2; }
+      else if( lv === '無液化'){ level = 1; }
+      else if( lv === '非本圖所示資料精度區'){ level = 0; }
+
+      var colors = ['#49CCED', '#555555', '#9ACD32', '#FED261', 'red'];
 
       return {
         fillColor: colors[level],
@@ -90,10 +114,19 @@ $('.level').on('change', function(e){
         visible: (i === level)
       };
     });
-  }else{
+  }
+  else {
     dataMap.setStyle(function(feature) {
-      var level = feature.getProperty('classify');
-      var colors = ['#9ACD32', '#FED261', 'red'];
+      var level = 0;
+      var lv = feature.getProperty('液化程度');
+
+      if( lv === '高度液化'){ level = 4; }
+      else if( lv === '中度液化'){ level = 3; }
+      else if( lv === '低度液化'){ level = 2; }
+      else if( lv === '無液化'){ level = 1; }
+      else if( lv === '非本圖所示資料精度區'){ level = 0; }
+
+      var colors = ['#49CCED', '#555555', '#9ACD32', '#FED261', 'red'];
 
       return {
         fillColor: colors[level],
