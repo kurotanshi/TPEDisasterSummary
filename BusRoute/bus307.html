@@ -1,0 +1,95 @@
+<html>
+<head>
+  <title>公車路線圖</title>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%; margin: 0; padding: 0;
+    }
+    #map{
+      position: relative; width: 650px; height: 400px; z-index: 2;
+    }
+    .busStops{ position: absolute; font-weight: 900; width: 100%; }
+    i{ display: block; width: 10px; height: 10px; margin-right: .7em; background-color: #f00; }
+
+    .switch{
+      margin-bottom: 1em;
+    }
+    .switch button, #bus {
+      font-size: 30px; margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="switch">
+
+  <button class="bus">307</button>
+  <button class="bus">604</button>
+  <button class="bus">285</button>
+
+  <input id="bus" type="text"><button class="query">自行輸入</button>
+
+</div>
+
+<div id="map"></div>
+
+
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCogdyMaKSdYambuOPMJikTcz6y8GFoLSA&libraries=drawing,places"></script>`
+<script src="//s1.hfcdn.com/fp/common/js/googlemaps-richmarker-compiled.js"></script>
+<script src="//code.jquery.com/jquery-1.12.1.min.js"></script>
+<script src="//npmcdn.com/@turf/turf/turf.min.js"></script>
+
+<script type="text/javascript">
+
+// (function(){
+
+var map;
+var dataMap = new google.maps.Data();
+
+map = new google.maps.Map(document.getElementById('map'), {
+  zoom: 14,
+  center: new google.maps.LatLng(25.046516418457, 121.516815185547),
+  mapTypeId: google.maps.MapTypeId.TERRAIN
+});
+
+$('button').on('click', function(e){
+  e.preventDefault();
+
+  var $this = $(this);
+  var route = ( $this.hasClass('query') ) ? $.trim($('#bus').val()) : $this.text();
+
+  $.get('http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/Taipei/'+ route +'?$top=9999&$format=JSON', function(d){
+    var route = d[0];
+    var busStops = [],
+        markers = [];
+
+    while (markers.length > 0) {
+      markers.pop().setMap(null);
+    }
+
+    map.panTo( new google.maps.LatLng(route.Stops[0].StopPosition.PositionLat, route.Stops[0].StopPosition.PositionLon) );
+
+    route.Stops.map((d) => {
+      console.log( d.StopName.Zh_tw, d.StopPosition.PositionLat, d.StopPosition.PositionLon );
+
+      var marker = new RichMarker({
+        position: new google.maps.LatLng(d.StopPosition.PositionLat, d.StopPosition.PositionLon),
+        map: map,
+        draggable: false,
+        content: '<i></i><div class="busStops">'+ d.StopName.Zh_tw +'</div>'
+      });
+
+      marker.setShadow(0);
+      markers.push(marker);
+    });
+
+  });
+
+});
+
+
+</script>
+
+</body>
+</html>
