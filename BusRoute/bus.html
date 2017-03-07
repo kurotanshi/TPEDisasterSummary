@@ -46,6 +46,7 @@
 
 var map;
 var dataMap = new google.maps.Data();
+var markers = [];
 
 map = new google.maps.Map(document.getElementById('map'), {
   zoom: 14,
@@ -63,8 +64,7 @@ $('button').on('click', function(e){
 
   $.get('//ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/Taipei/'+ route +'?$top=9999&$format=JSON', function(d){
     var route = d[0];
-    var busStops = [],
-        markers = [];
+    var busStops = [];
 
     while (markers.length > 0) {
       markers.pop().setMap(null);
