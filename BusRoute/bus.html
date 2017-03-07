@@ -61,7 +61,7 @@ $('button').on('click', function(e){
 
   if( route === '' ) return;
 
-  $.get('http://ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/Taipei/'+ route +'?$top=9999&$format=JSON', function(d){
+  $.get('//ptx.transportdata.tw/MOTC/v2/Bus/StopOfRoute/City/Taipei/'+ route +'?$top=9999&$format=JSON', function(d){
     var route = d[0];
     var busStops = [],
         markers = [];
