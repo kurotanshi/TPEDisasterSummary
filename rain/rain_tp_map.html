@@ -3,221 +3,125 @@
 
 <head>
   <meta charset="utf-8">
-  <title>台北市降雨淹水模擬圖</title>
-  <meta property="og:title" content="台北市降雨淹水模擬圖" />
-  <meta property="og:image" content="http://kurotanshi.github.io/TPEDisasterSummary/rain/image.png" />
-  <meta property="og:url" content="http://kurotanshi.github.io/TPEDisasterSummary/rain/rain_tp_map.html" />
+  <title>台北市降雨淹水潛勢圖</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+
+  <meta property="og:title" content="台北市降雨淹水潛勢圖" />
+  <meta property="og:description" content="台北市降雨淹水潛勢圖" />
+  <meta property="og:image" content="https://kurotanshi.github.io/TPEDisasterSummary/rain/image.png" />
+  <meta property="og:url" content="https://kurotanshi.github.io/TPEDisasterSummary/rain/rain_tp_map.html" />
+
   <style>
-    #mapDiv {
+    #map-app {
+      top: 0;
+      left: 0;
+      position: absolute;
       display: block;
-      width: 1000px;
-      height: 600px;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
-    
+
+    .info {
+      display: block;
+      padding: 1em 1.5em;
+      width: 420px;
+      height: 130px;
+      background-color: #fff;
+      border: 1px solid #000;
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      right: 0;
+    }
+
     h1,
     p {
-      margin: 0.5em 0;
+      margin: 0 0 20px;
+      padding: 0;
     }
-    
+
     .block {
       display: inline-block;
       width: 12px;
       height: 12px;
       margin-right: 5px;
     }
-    
+
     .deep {
       display: inline-block;
       margin-right: 1em;
       margin-left: 5px;
     }
   </style>
-  <script src="js/d3.v3.min.js"></script>
-  <script src="js/jquery-1.11.3.min.js"></script>
-  <script src="js/togeojson.js"></script>
-  <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyBxKtiOh3lYNzXBI6jjjC_oOGaqF1Z6Uy0&libraries=drawing"></script>
-
 </head>
 
-<body onload="initMap()">
-  <h1>台北市降雨淹水模擬圖</h1>
-  <p>資料來源: <a target="_blank" href="http://data.taipei/opendata/datalist/datasetMeta?oid=fa1e8012-ebb4-473b-888e-97f9a9ce365e">臺北市降雨淹水模擬圖</a></p>
-  <p>
-    <label><input class="default" type="radio" name="rain" value="78" checked>78.8 mm/hr </label>
-    <label><input type="radio" name="rain" value="100">100 mm/hr </label>
-    <label><input type="radio" name="rain" value="130">130 mm/hr </label> 降雨條件下之可能淹水範圍及深度
-  </p>
-  <p>
-    淹水深度(m):
-    <span class="deep"><i class="block" style="background-color:#0070FF"></i> < 0.3</span>
-    <span class="deep"><i class="block" style="background-color:#54FF00"></i> 0.3 ~ 1.0</span>
-    <span class="deep"><i class="block" style="background-color:#FFAA00"></i> 1.0 ~ 3.0</span>
-    <span class="deep"><i class="block" style="background-color:#FF0000"></i> > 3.0</span>
-  </p>
-  <div id="mapDiv"></div>
+<body>
 
-  <!-- <script src="js/script.js"></script> -->
+  <div class="info">
+    <h1>台北市降雨淹水模擬圖</h1>
+    <p>資料來源: <a target="_blank"
+        href="http://wise.wra.gov.tw/dataset/inundationprobabilitymaps/resource/a7b3ab9d-d200-4613-bf58-403e4db26e35">經濟部水利署/水利防災中心:
+        淹水潛勢圖</a>
+    </p>
+    <p>
+      選擇雨量：
+      <select id="rain">
+        <option value="06h_r150">6小時 150mm</option>
+        <option value="06h_r250">6小時 250mm</option>
+        <option value="06h_r350">6小時 350mm</option>
+        <option value="12h_r200">12小時 200mm</option>
+        <option value="12h_r300">12小時 300mm</option>
+        <option value="12h_r400">12小時 400mm</option>
+        <option value="24h_r200">24小時 200mm</option>
+        <option value="24h_r350">24小時 350mm</option>
+        <option value="24h_r500">24小時 500mm</option>
+        <option value="24h_r650">24小時 650mm</option>
+      </select>
+    </p>
+  </div>
+
+  <div id="map-app"></div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+    crossorigin=""></script>
+
   <script>
-    function initMap() {
+    (function ($) {
+      var map = L.map('map-app').setView([25.0677505, 121.5470599], 14);
+      var layer;
 
-      var styles = [{
-        featureType: "landscape",
-        elementType: "labels",
-        stylers: [{
-          visibility: "off"
-        }]
-      }, {
-        featureType: "transit",
-        elementType: "labels",
-        stylers: [{
-          visibility: "off"
-        }]
-      }, {
-        featureType: "poi",
-        elementType: "labels",
-        stylers: [{
-          visibility: "off"
-        }]
-      }, {
-        featureType: "water",
-        elementType: "labels",
-        stylers: [{
-          visibility: "off"
-        }]
-      }, {
-        featureType: "road",
-        elementType: "labels.icon",
-        stylers: [{
-          visibility: "off"
-        }]
-      }, {
-        stylers: [{
-          hue: "#00aaff"
-        }, {
-          saturation: -100
-        }, {
-          gamma: 2.15
-        }, {
-          lightness: 12
-        }]
-      }, {
-        featureType: "road",
-        elementType: "labels.text.fill",
-        stylers: [{
-          visibility: "on"
-        }, {
-          lightness: 24
-        }]
-      }, {
-        featureType: "road",
-        elementType: "geometry",
-        stylers: [{
-          lightness: 57
-        }]
-      }];
+      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 19,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+          '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+          'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+      }).addTo(map);
 
-      // 地圖初始設定
-      var mapOptions = {
-        center: new google.maps.LatLng(25.047502948494675, -238.44572067260742),
-        zoom: 12,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        styles: styles
+      function render(val) {
+        val = val || '06h_r150';
+        if (layer) {
+          layer.remove();
+        }
+        $.getJSON('./data/tp_' + val + '.json', function (r) {
+          layer = L.geoJSON(r, { color: '#F00' }).addTo(map);
+        });
       };
 
-      var mapElement = document.getElementById("mapDiv");
-      var dataMap = new google.maps.Data();
 
-      // Google 地圖初始化
-      map = new google.maps.Map(mapElement, mapOptions);
-
-      var geoObj = {},
-        d1 = $.Deferred(),
-        d2 = $.Deferred(),
-        d3 = $.Deferred(),
-        w = $.when(d1, d2, d3);
-
-      w.done(function(geo) {
-        $('input[name="rain"].default').prop('checked', true);
-        dataMap.setMap(null);
-        dataMap = new google.maps.Data();
-        dataMap.addGeoJson(geoObj.d1);
-        dataMap.setMap(map);
-
-        dataMap.setStyle(function(feature) {
-          if (feature.getProperty('name') === '0.3') {
-            return {
-              fillOpacity: 0.35,
-              fillColor: '#0070FF',
-              strokeWeight: 2,
-              strokeColor: '#0070FF',
-              strokeOpacity: 1
-            };
-          }
-          if (feature.getProperty('name') === '0.3~1.0') {
-            return {
-              fillOpacity: 0.35,
-              fillColor: '#54FF00',
-              strokeWeight: 2,
-              strokeColor: '#54FF00',
-              strokeOpacity: 1
-            };
-          }
-        });
-
-        $('input[name="rain"]').on('change', function() {
-          var v = $(this).val();
-          dataMap.setMap(null);
-          dataMap = new google.maps.Data();
-          dataMap.setStyle(function(feature) {
-            if (feature.getProperty('name') === '0.3') {
-              return {
-                fillOpacity: 0.35,
-                fillColor: '#0070FF',
-                strokeWeight: 2,
-                strokeColor: '#0070FF',
-                strokeOpacity: 1
-              };
-            }
-            if (feature.getProperty('name') === '0.3~1.0') {
-              return {
-                fillOpacity: 0.35,
-                fillColor: '#54FF00',
-                strokeWeight: 2,
-                strokeColor: '#54FF00',
-                strokeOpacity: 1
-              };
-            }
-          });
-          if (v === '78') {
-            dataMap.addGeoJson(geoObj.d1);
-          } else if (v === '100') {
-            dataMap.addGeoJson(geoObj.d2);
-          } else {
-            dataMap.addGeoJson(geoObj.d3);
-          }
-          dataMap.setMap(map);
-        });
+      $('#rain').on('change', function (e) {
+        render($(this).val());
       });
 
-      $.get('78mm.kml', function(d) {
-        var geo = toGeoJSON.kml(d);
-        geoObj.d1 = geo;
-        d1.resolve();
-      });
-
-      $.get('100mm.kml', function(d) {
-        var geo = toGeoJSON.kml(d);
-        geoObj.d2 = geo;
-        d2.resolve();
-      });
-
-      $.get('130mm.kml', function(d) {
-        var geo = toGeoJSON.kml(d);
-        geoObj.d3 = geo;
-        d3.resolve();
-      });
-
-    }
+      render();
+    })(jQuery);
   </script>
 
 </body>
