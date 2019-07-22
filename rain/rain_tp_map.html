@@ -64,7 +64,7 @@
   <div class="info">
     <h1>台北市降雨淹水模擬圖</h1>
     <p>資料來源: <a target="_blank"
-        href="http://wise.wra.gov.tw/dataset/inundationprobabilitymaps/resource/a7b3ab9d-d200-4613-bf58-403e4db26e35">經濟部水利署/水利防災中心:
+        href="http://wise.wra.gov.tw/dataset/inundationprobabilitymaps">經濟部水利署/水利防災中心:
         淹水潛勢圖</a>
     </p>
     <p>
@@ -111,9 +111,16 @@
           layer.remove();
         }
         $.getJSON('./data/tp_' + val + '.json', function (r) {
-          layer = L.geoJSON(r, { color: '#F00' })
+          layer = L.geoJSON(r, {
+            style: function (feature) {
+              const colorRange = ['', '#ffd27d', '#fcb906', '#ff620b', '#fc0000', '#850001'];
+              return {
+                color: colorRange[+feature.properties.GRIDCODE] 
+              };
+            }
+          })
             .bindPopup(function (layer) {
-              return layer.feature.properties.SCENARIOS;
+              return layer.feature.properties.NOTE;
             })
             .addTo(map);
         });
