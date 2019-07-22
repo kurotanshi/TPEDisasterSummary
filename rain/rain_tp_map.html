@@ -70,16 +70,16 @@
     <p>
       選擇雨量：
       <select id="rain">
-        <option value="06h_r150">6小時 150mm</option>
-        <option value="06h_r250">6小時 250mm</option>
-        <option value="06h_r350">6小時 350mm</option>
-        <option value="12h_r200">12小時 200mm</option>
-        <option value="12h_r300">12小時 300mm</option>
-        <option value="12h_r400">12小時 400mm</option>
-        <option value="24h_r200">24小時 200mm</option>
-        <option value="24h_r350">24小時 350mm</option>
-        <option value="24h_r500">24小時 500mm</option>
-        <option value="24h_r650">24小時 650mm</option>
+        <option value="06h_r150">6小時延時定量降水150毫米</option>
+        <option value="06h_r250">6小時延時定量降水250毫米</option>
+        <option value="06h_r350">6小時延時定量降水350毫米</option>
+        <option value="12h_r200">12小時延時定量降水200毫米</option>
+        <option value="12h_r300">12小時延時定量降水300毫米</option>
+        <option value="12h_r400">12小時延時定量降水400毫米</option>
+        <option value="24h_r200">24小時延時定量降水200毫米</option>
+        <option value="24h_r350">24小時延時定量降水350毫米</option>
+        <option value="24h_r500">24小時延時定量降水500毫米</option>
+        <option value="24h_r650">24小時延時定量降水650毫米</option>
       </select>
     </p>
   </div>
@@ -111,7 +111,11 @@
           layer.remove();
         }
         $.getJSON('./data/tp_' + val + '.json', function (r) {
-          layer = L.geoJSON(r, { color: '#F00' }).addTo(map);
+          layer = L.geoJSON(r, { color: '#F00' })
+            .bindPopup(function (layer) {
+              return layer.feature.properties.SCENARIOS;
+            })
+            .addTo(map);
         });
       };
 
